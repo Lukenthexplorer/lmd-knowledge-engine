@@ -58,3 +58,22 @@ idioma_elegivel(Idioma, Media) :-
     length(Lista, N),
     N >= 10,
     media_paginas_idioma(Idioma, Media).
+
+media_geral(Media) :-
+    findall(Nota, livro(_, _, _, Nota, _, _, _, _), Notas),
+    sum_list(Notas, Soma),
+    length(Notas, N),
+    Media is Soma / N.
+
+livro_destaque(Titulo, Avaliacoes) :-
+    media_geral(MediaGeral),
+    livro(Titulo, _, _, Nota, _, Avaliacoes, _, _),
+    Nota > MediaGeral,
+    Avaliacoes > 10000.
+
+% Pergunta 3: os 10 livros mais avaliados com nota acima da média geral
+top10_destaques(Top) :-
+    findall(Avaliacoes-Titulo, livro_destaque(Titulo, Avaliacoes), Pares),
+    sort(0, @>=, Pares, Ordenado),
+    length(Top, 10),
+    append(Top, _, Ordenado).
