@@ -1,23 +1,33 @@
 :- encoding(utf8).
 :- consult('livros.pl').
 
+% livro(Titulo, Autor, Idioma, Nota, Paginas, Avaliacoes, Ano, Editora)
 
 
-
-% Média das notas de um autor
-media_autor(Autor, Media) :-
-    findall(Nota, livro(_, Autor, _, Nota, _, _, _, _), Notas),
-    Notas \= [],
-    sum_list(Notas, Soma),
-    length(Notas, N),
+% calcula a media de uma lista
+media(Lista, Media) :-
+    Lista \= [],
+    sum_list(Lista, Soma),
+    length(Lista, N),
     Media is Soma / N.
 
-% Quantidade de livros de um autor
-qtd_livros(Autor, N) :-
-    findall(Nota, livro(_, Autor, _, Nota, _, _, _, _), Notas),
-    length(Notas, N).
+% pega os N primeiros da lista
+primeiros(N, Lista, Primeiros) :-
+    length(Primeiros, N),
+    append(Primeiros, _, Lista).
 
-% Autor com pelo menos 3 livros, e a média dele
+
+% ---------- Pergunta 1 ----------
+% top 10 autores com maior nota media (minimo 3 livros)
+
+media_autor(Autor, Media) :-
+    findall(Nota, livro(_, Autor, _, Nota, _, _, _, _), Notas),
+    media(Notas, Media).
+
+qtd_livros(Autor, N) :-
+    findall(Titulo, livro(Titulo, Autor, _, _, _, _, _, _), Livros),
+    length(Livros, N).
+
 autor_elegivel(Autor, Media) :-
     findall(A, livro(_, A, _, _, _, _, _, _), Todos),
     sort(Todos, Autores),
@@ -26,30 +36,19 @@ autor_elegivel(Autor, Media) :-
     N >= 3,
     media_autor(Autor, Media).
 
-
-
-% Pergunta 1: os 10 autores com maior nota média (mínimo de 3 livros)
 top10_autores(Top) :-
     findall(Media-Autor, autor_elegivel(Autor, Media), Pares),
     sort(0, @>=, Pares, Ordenado),
-    length(Top, 10),
-    append(Top, _, Ordenado).
+    primeiros(10, Ordenado, Top).
 
+
+% ---------- Pergunta 2 ----------
+% ranking dos idiomas pela media de paginas (minimo 10 livros)
 
 media_paginas_idioma(Idioma, Media) :-
     findall(Paginas, livro(_, _, Idioma, _, Paginas, _, _, _), Lista),
-    Lista \= [],
-    sum_list(Lista, Soma),
-    length(Lista, N),
-    Media is Soma / N.
+    media(Lista, Media).
 
-
-% Pergunta 2: ranking de idiomas pela média de páginas (mínimo de 10 livros)
-ranking_paginas_idioma(Ranking) :-
-    findall(Media-Idioma, idioma_elegivel(Idioma, Media), Pares),
-    sort(0, @>=, Pares, Ranking).
-
-% Idioma com pelo menos 10 livros, e a média de páginas dele
 idioma_elegivel(Idioma, Media) :-
     findall(I, livro(_, _, I, _, _, _, _, _), Todos),
     sort(Todos, Idiomas),
@@ -59,11 +58,17 @@ idioma_elegivel(Idioma, Media) :-
     N >= 10,
     media_paginas_idioma(Idioma, Media).
 
+ranking_paginas_idioma(Ranking) :-
+    findall(Media-Idioma, idioma_elegivel(Idioma, Media), Pares),
+    sort(0, @>=, Pares, Ranking).
+
+
+% ---------- Pergunta 3 ----------
+% top 10 livros mais avaliados com nota acima da media geral
+
 media_geral(Media) :-
     findall(Nota, livro(_, _, _, Nota, _, _, _, _), Notas),
-    sum_list(Notas, Soma),
-    length(Notas, N),
-    Media is Soma / N.
+    media(Notas, Media).
 
 livro_destaque(Titulo, Avaliacoes) :-
     media_geral(MediaGeral),
@@ -71,9 +76,7 @@ livro_destaque(Titulo, Avaliacoes) :-
     Nota > MediaGeral,
     Avaliacoes > 10000.
 
-% Pergunta 3: os 10 livros mais avaliados com nota acima da média geral
 top10_destaques(Top) :-
     findall(Avaliacoes-Titulo, livro_destaque(Titulo, Avaliacoes), Pares),
     sort(0, @>=, Pares, Ordenado),
-    length(Top, 10),
-    append(Top, _, Ordenado).
+    primeiros(10, Ordenado, Top).
