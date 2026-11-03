@@ -12,19 +12,10 @@ media_autor(Autor, Media) :-
     length(Notas, N),
     Media is Soma / N.
 
-
-
-
-
-
 % Quantidade de livros de um autor
 qtd_livros(Autor, N) :-
     findall(Nota, livro(_, Autor, _, Nota, _, _, _, _), Notas),
     length(Notas, N).
-
-
-
-
 
 % Autor com pelo menos 3 livros, e a média dele
 autor_elegivel(Autor, Media) :-
@@ -43,3 +34,27 @@ top10_autores(Top) :-
     sort(0, @>=, Pares, Ordenado),
     length(Top, 10),
     append(Top, _, Ordenado).
+
+
+media_paginas_idioma(Idioma, Media) :-
+    findall(Paginas, livro(_, _, Idioma, _, Paginas, _, _, _), Lista),
+    Lista \= [],
+    sum_list(Lista, Soma),
+    length(Lista, N),
+    Media is Soma / N.
+
+
+% Pergunta 2: ranking de idiomas pela média de páginas (mínimo de 10 livros)
+ranking_paginas_idioma(Ranking) :-
+    findall(Media-Idioma, idioma_elegivel(Idioma, Media), Pares),
+    sort(0, @>=, Pares, Ranking).
+
+% Idioma com pelo menos 10 livros, e a média de páginas dele
+idioma_elegivel(Idioma, Media) :-
+    findall(I, livro(_, _, I, _, _, _, _, _), Todos),
+    sort(Todos, Idiomas),
+    member(Idioma, Idiomas),
+    findall(P, livro(_, _, Idioma, _, P, _, _, _), Lista),
+    length(Lista, N),
+    N >= 10,
+    media_paginas_idioma(Idioma, Media).
