@@ -1,3 +1,4 @@
+:- encoding(utf8).
 :- consult('livros.pl').
 
 

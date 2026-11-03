@@ -26,6 +26,7 @@ df["ano"] = df["publication_date"].str.split("/").str[-1].astype(int)
 df = df[df["ratings_count"] > 0]
 
 with open(SAIDA, "w", encoding="utf-8") as arquivo:
+    arquivo.write(":- encoding(utf8).\n")
     arquivo.write("% Base de livros do Goodreads\n")
     arquivo.write(
         "% livro(Titulo, Autor, Idioma, Nota, Paginas, Avaliacoes, Ano, Editora).\n\n"

@@ -1,3 +1,4 @@
+:- encoding(utf8).
 % Base de livros do Goodreads
 % livro(Titulo, Autor, Idioma, Nota, Paginas, Avaliacoes, Ano, Editora).
 
